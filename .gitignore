@@ -1,0 +1,53 @@
+# Normal rules
+.*
+*.a
+*.bin
+*.bz2
+*.c.*
+*.d
+*.dwo
+*.elf
+*.gz
+*.i
+*.in
+*.in~
+*.ll
+*.lst
+*.lzma
+*.lzo
+*.o
+*.patch
+*.so
+*.tar
+*.xz
+*.zst
+
+# Top-level files
+server/mratd
+client/mrat-client
+
+# Autotools leavings
+autom4te.cache
+aclocal.m4
+build-aux
+compile
+configure
+configure~
+config.log
+config.status
+depcomp
+include/config.h
+include/stamp-h1
+install-sh
+Makefile
+missing
+
+# Don't ignore these
+!.gitattributes
+!.gitignore
+
+# ctags/cscope files
+cscope.*
+ncscope.*
+tags
+TAGS

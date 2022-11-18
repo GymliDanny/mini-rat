@@ -36,8 +36,8 @@ configure~
 config.log
 config.status
 depcomp
-include/config.h
-include/stamp-h1
+config.h
+stamp-h1
 install-sh
 Makefile
 missing

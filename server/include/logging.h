@@ -15,4 +15,6 @@ int init_logging(FILE *out_file);
 int vlog_msg(int level, const char *fmt, va_list args);
 int log_msg(int level, const char *fmt, ...);
 
+void close_logfile(void);
+
 #endif

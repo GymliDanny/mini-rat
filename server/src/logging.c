@@ -1,8 +1,4 @@
 #include <logging.h>
-#include <stdio.h>
-#include <pthread.h>
-#include <time.h>
-#include <string.h>
 
 static const char *severe = "SEVERE";
 static const char *warn = "WARN";

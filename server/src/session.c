@@ -1,8 +1,6 @@
 #include <session.h>
 #include <util.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdint.h>
+#include <mini-rat.h>
 
 struct list_head sessions;
 uint16_t next_id = 1;

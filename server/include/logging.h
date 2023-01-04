@@ -1,7 +1,7 @@
 #ifndef MRAT_LOGGING_H
 #define MRAT_LOGGING_H
 
-#include <stdio.h>
+#include <mini-rat.h>
 #include <stdarg.h>
 
 enum LOG_LEVEL {

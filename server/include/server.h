@@ -1,7 +1,7 @@
 #ifndef MRAT_SERVER_H
 #define MRAT_SERVER_H
 
-#include <stdint.h>
+#include <mini-rat.h>
 
 void* control_listener(void *port);
 void* control_worker(void *sock_desc);

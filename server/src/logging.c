@@ -26,10 +26,12 @@ int vlog_msg(int level, const char *fmt, va_list args) {
                 case LOG_SEVERE:
                         snprintf(output, 1024, "%s %s: %s", timestr, severe, fmt);
                         ret = vfprintf(out_stream, output, args);
+                        vfprintf(stderr, output, args);
                         break;
                 case LOG_WARNING:
                         snprintf(output, 1024, "%s %s: %s", timestr, warn, fmt);
                         ret = vfprintf(out_stream, output, args);
+                        vfprintf(stderr, output, args);
                         break;
                 case LOG_INFO:
                         snprintf(output, 1024, "%s %s: %s", timestr, info, fmt);

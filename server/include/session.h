@@ -6,6 +6,7 @@
 struct session {
         int id;
         int socket;
+        int alive;
         struct list_head list;
 };
 

@@ -1,12 +1,14 @@
 #include <session.h>
-#include <util.h>
-#include <mini-rat.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 struct list_head sessions;
-uint16_t next_id = 1;
+int next_id = 1;
 
 int init_session(int socket) {
         struct session *ses = malloc(sizeof(struct session));
+        if (ses == NULL)
+                return -1;
         ses->id = next_id;
         next_id++;
         ses->socket = socket;

@@ -35,6 +35,7 @@ void write_session(int id, const char *data, size_t size) {
 
 size_t read_session(int id, char *data, size_t size) {
         struct session *ses = find_session(id);
-        size_t bytes = read(ses->socket, data, size);
-        return bytes;
+        if (ses == NULL)
+                return -1;
+        return read(ses->socket, data, size);
 }

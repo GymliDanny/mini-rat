@@ -10,7 +10,7 @@ void parse_cmd(const char *line) {
                 running = 0;
         } else if (strncmp(line, "session ", 8) == 0) {
                 sprintf(line, "session %d", cur_session);
-                print("Swapped current session to %d\n", cur_session);
+                printf("Swapped current session to %d\n", cur_session);
         }
         return;
 }

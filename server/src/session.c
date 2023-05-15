@@ -28,9 +28,9 @@ struct session* find_session(int id) {
         return ses;
 }
 
-void write_session(int id, const char *data, size_t size) {
+int write_session(int id, const char *data, size_t size) {
         struct session *ses = find_session(id);
-        write(ses->socket, data, size);
+        return write(ses->socket, data, size);
 }
 
 size_t read_session(int id, char *data, size_t size) {

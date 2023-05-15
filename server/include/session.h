@@ -12,7 +12,7 @@ struct session {
 
 int init_session(int socket);
 struct session* find_session(int id);
-void write_session(int id, const char *data, size_t size);
+int write_session(int id, const char *data, size_t size);
 size_t read_session(int id, char *data, size_t size);
 
 #endif

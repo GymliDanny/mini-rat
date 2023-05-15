@@ -12,6 +12,7 @@ int init_session(int socket) {
         ses->id = next_id;
         next_id++;
         ses->socket = socket;
+        ses->alive = 1;
         list_add(&ses->list, &sessions);
         return ses->id;
 }
@@ -38,4 +39,17 @@ size_t read_session(int id, char *data, size_t size) {
         if (ses == NULL)
                 return -1;
         return read(ses->socket, data, size);
+}
+
+int num_alive_sessions(void) {
+        int ret = 0;
+
+        struct list_head *temp = sessions.next;
+        while (temp != NULL) {
+                if (container_of(temp, struct session, list)->alive == 1)
+                        ret++;
+                temp = temp->next;
+        }
+
+        return ret;
 }

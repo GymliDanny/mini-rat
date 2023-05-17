@@ -7,8 +7,8 @@ inspiration from ![AsyncRAT](https://github.com/NYAN-x-CAT/AsyncRAT-C-Sharp).
 ## Installation and Deployment
 
 This project is split into two subprojects: the server (mratd) and client
-(mrat-client). The Mini-RAT server (mratd) requires OpenSSL and POSIX threads.
-The Mini-RAT client (mrat-client) only requires the C standard library.
+(mrat). Both the server and reference client requires OpenSSL, but only the
+server requires POSIX threads.
 
 The mratd server needs to run a master control server that all clients have
 access to, either on the Internet with port-forwarding or on the local network.

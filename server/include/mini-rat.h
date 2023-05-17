@@ -53,4 +53,12 @@
 #include <unistd.h>
 #endif
 
+#ifdef HAVE_TIME_H
+#include <time.h>
+#endif
+
+#ifdef HAVE_STDARG_H
+#include <stdarg.h>
+#endif
+
 #endif // ifndef MINI_RAT_H

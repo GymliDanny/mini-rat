@@ -2,7 +2,6 @@
 #define MRAT_LOGGING_H
 
 #include <mini-rat.h>
-#include <stdarg.h>
 
 enum LOG_LEVEL {
         LOG_SEVERE,

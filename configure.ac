@@ -7,5 +7,6 @@ AM_INIT_AUTOMAKE([1.16 -Wall -Werror foreign subdir-objects])
 AC_CONFIG_FILES([Makefile])
 
 AC_CONFIG_SUBDIRS([server])
+AC_CONFIG_SUBDIRS([client])
 
 AC_OUTPUT

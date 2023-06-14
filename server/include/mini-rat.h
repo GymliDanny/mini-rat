@@ -25,6 +25,14 @@
 #include <arpa/inet.h>
 #endif
 
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
+
+#ifdef HAVE_POLL_H
+#include <poll.h>
+#endif
+
 #ifdef HAVE_PTHREAD_H
 #include <pthread.h>
 #endif
@@ -55,6 +63,10 @@
 
 #ifdef HAVE_TIME_H
 #include <time.h>
+#endif
+
+#ifdef HAVE_SIGNAL_H
+#include <signal.h>
 #endif
 
 #ifdef HAVE_STDARG_H

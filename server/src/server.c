@@ -1,11 +1,7 @@
 #include <server.h>
 #include <session.h>
 #include <logging.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <pthread.h>
+#include <mini-rat.h>
 
 void* listener(void *port) {
         uint16_t port_num = *(int*)port;
@@ -27,29 +23,51 @@ void* listener(void *port) {
 
         int client_sock = 0;
         pthread_t newthread;
-        while (client_sock = accept(server_sock, (struct sockaddr*)&client_name, &client_name_len)) {
+        while ((client_sock = accept(server_sock, (struct sockaddr*)&client_name, &client_name_len))) {
                 pthread_create(&newthread, NULL, worker, (void*)&client_sock);
                 pthread_detach(newthread);
         }
 
         close_logfile();
         close(server_sock);
-}
-
-int perform_handshake(int socket) {
-        // TODO: call openssl stuff here
         return 0;
 }
 
 void* worker(void *sock_desc) {
         int sock = *(int*)sock_desc;
-        if (perform_handshake(sock) != 0)
-                return NULL;
+        fcntl(sock, F_SETFL, fcntl(sock, F_GETFL, 0) & O_NONBLOCK);
 
-        int id = init_session(sock);
-        log_msg(LOG_INFO, "New session created with ID=%d\n", id);
-        // TODO: keep the client from timing out
+        struct session *ses = find_session(init_session(sock));
+        log_msg(LOG_INFO, "New session created with ID=%d\n", ses->id);
 
-        close(sock);
+        // TODO: have this thread actually do something
+        while (ses->alive == 1);
+
+        return 0;
+}
+
+ssize_t output_pump(int sock, char *buffer, size_t sz) {
+        struct pollfd pfd[1];
+        pfd[0].fd = sock;
+        pfd[0].events = POLLIN;
+        int status = poll(pfd, 1, 15000);
+        if (status < 0)
+                return -1;
+        else if (pfd[0].revents & POLLIN)
+                return send(sock, buffer, sz, 0);
+
+        return 0;
+}
+
+ssize_t input_pump(int sock, char *buffer, size_t sz) {
+        struct pollfd pfd[1];
+        pfd[0].fd = sock;
+        pfd[0].events = POLLIN;
+        int status = poll(pfd, 1, 15000);
+        if (status < 0)
+                return -1;
+        else if (pfd[0].revents & POLLIN)
+                return recv(sock, buffer, sz, 0);
+        
         return 0;
 }

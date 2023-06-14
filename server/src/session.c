@@ -1,6 +1,5 @@
 #include <session.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include <server.h>
 
 struct list_head sessions;
 int next_id = 1;
@@ -23,22 +22,34 @@ struct session* find_session(int id) {
         while (temp != NULL) {
                 ses = (struct session*)container_of(temp, struct session, list);
                 if (ses->id == id)
-                        break;
+                        return ses;
                 temp = temp->next;
         }
-        return ses;
+        return NULL;
 }
 
-int write_session(int id, const char *data, size_t size) {
-        struct session *ses = find_session(id);
-        return write(ses->socket, data, size);
-}
-
-size_t read_session(int id, char *data, size_t size) {
+ssize_t write_session(int id, char *buffer, size_t sz) {
         struct session *ses = find_session(id);
         if (ses == NULL)
                 return -1;
-        return read(ses->socket, data, size);
+
+        return send(ses->socket, buffer, sz, 0);
+}
+
+ssize_t read_session(int id, char *buffer, size_t sz) {
+        struct session *ses = find_session(id);
+        if (ses == NULL)
+                return -1;
+
+        return recv(ses->socket, buffer, sz, 0);
+}
+
+void kill_session(int id) {
+        struct session *s = find_session(id);
+        s->alive = 0;
+        list_del(&s->list);
+        close(s->socket);
+        free(s);
 }
 
 int num_alive_sessions(void) {

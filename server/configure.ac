@@ -1,4 +1,4 @@
-AC_INIT([mratd], [0.01])
+AC_INIT([mratd], [1.00])
 AC_PREREQ([2.71])
 AC_CONFIG_SRCDIR([src/mini-rat.c])
 AC_CONFIG_HEADERS([include/config.h])

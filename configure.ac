@@ -1,4 +1,4 @@
-AC_INIT([mini-rat], [0.01])
+AC_INIT([mini-rat], [1.00])
 AC_PREREQ([2.71])
 
 AC_CONFIG_AUX_DIR([build-aux])

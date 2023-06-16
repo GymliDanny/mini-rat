@@ -46,6 +46,9 @@ ssize_t read_session(int id, char *buffer, size_t sz) {
 
 void kill_session(int id) {
         struct session *s = find_session(id);
+        if (s == NULL)
+                return;
+
         s->alive = 0;
         list_del(&s->list);
         close(s->socket);

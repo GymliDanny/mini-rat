@@ -24,7 +24,7 @@
 
 # Top-level files
 server/mratd
-client/mrat-client
+client/mrat
 
 # Autotools leavings
 autom4te.cache

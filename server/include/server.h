@@ -6,6 +6,8 @@
 void* control_listener(void *port);
 void* control_worker(void *sock_desc);
 
+int ping_pong(int sock);
+
 void* listener(void *port);
 void* worker(void *sock_desc);
 

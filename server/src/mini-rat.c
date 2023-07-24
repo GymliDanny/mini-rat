@@ -27,18 +27,26 @@ void print_hostinfo(void) {
                 return;
         write_session(cur_session, "HOSTINFO\r\n", 11);
         char *buffer = malloc(4096);
-        read_session(cur_session, buffer, 4096);
+        if (read_session(cur_session, buffer, 4096) >= 0) {
+                printf("Timeout on session %d\n", cur_session);
+                kill_session(cur_session);
+                cur_session = 0;
+                return;
+        }
+
         printf(buffer);
         free(buffer);
 }
 
 void swap_session(int session) {
-        if (find_session(session) == NULL) {
+        struct session *s = find_session(session);
+        if (s == NULL) {
                 printf("No such session\n");
                 return;
         }
 
         cur_session = session;
+        s->alive = 2;
         printf("Swapped to session %d\n", session);
 }
 
@@ -46,19 +54,20 @@ void run_exec(const char **argv) {
         if (cur_session == 0)
                 return;
 
-        write_session(cur_session, "EXEC ", 5);
+        char buffer[4096];
+        strcat(buffer, "EXEC ");
         size_t idx = 0;
         const char *temp = argv[idx];
         while (temp != NULL) {
-                write_session(cur_session, temp, strlen(temp));
-                write_session(cur_session, " ", 1);
+                strcat(buffer, temp);
+                strcat(buffer, " ");
                 temp = argv[++idx];
         }
-        write_session(cur_session, "\n", 1);
+        strcat(buffer, "\r\n");
+        write_session(cur_session, buffer, strlen(buffer));
 
-        char buffer[4096];
         read_session(cur_session, buffer, 4096);
-        printf("FROM TARGET: %s\n", buffer);
+        printf(buffer);
 }
 
 void parse_cmd(char *line) {
@@ -74,6 +83,9 @@ void parse_cmd(char *line) {
                         return;
                 }
                 swap_session(atoi(tokens[1]));
+        } else if (strcmp(tokens[0], "pingpong") == 0) {
+                struct session *s = find_session(cur_session);
+                ping_pong(s->socket);
         } else if (strcmp(tokens[0], "read") == 0) {
                 char buffer[1024];
                 read_session(cur_session, buffer, 1024);

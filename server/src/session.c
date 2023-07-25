@@ -60,7 +60,7 @@ int num_alive_sessions(void) {
 
         struct list_head *temp = sessions.next;
         while (temp != NULL) {
-                if (container_of(temp, struct session, list)->alive == 1)
+                if (container_of(temp, struct session, list)->alive != 0)
                         ret++;
                 temp = temp->next;
         }

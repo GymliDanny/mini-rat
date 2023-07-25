@@ -27,7 +27,7 @@ void print_hostinfo(void) {
                 return;
         write_session(cur_session, "HOSTINFO\r\n", 11);
         char *buffer = malloc(4096);
-        if (read_session(cur_session, buffer, 4096) >= 0) {
+        if (read_session(cur_session, buffer, 4096) <= 0) {
                 printf("Timeout on session %d\n", cur_session);
                 kill_session(cur_session);
                 cur_session = 0;

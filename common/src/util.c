@@ -7,6 +7,10 @@ char* str_rstrip(char *str) {
         int brakes = 1;
         while (brakes) {
                 switch (str[len]) {
+                        case '\r':
+                                str[len] = '\0';
+                                len--;
+                                break;
                         case '\n':
                                 str[len] = '\0';
                                 len--;
@@ -31,6 +35,10 @@ char* str_lstrip(char *str) {
         int brakes = 1;
         while (brakes) {
                 switch (str[0]) {
+                        case '\r':
+                                str[0] = '\0';
+                                str++;
+                                break;
                         case '\n':
                                 str[0] = '\0';
                                 str++;

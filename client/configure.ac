@@ -12,7 +12,7 @@ AC_CONFIG_FILES([Makefile])
 AC_CHECK_HEADERS([stdio.h stdlib.h string.h arpa/inet.h sys/socket.h], [], AC_MSG_ERROR([missing required headers]))
 
 AX_CHECK_COMPILE_FLAG([-Wall], [CFLAGS+=" -Wall"])
-AX_CHECK_COMPILE_FLAG([-Wextra], [CFLAGS+= "-Wextra"])
+AX_CHECK_COMPILE_FLAG([-Wextra], [CFLAGS+=" -Wextra"])
 
 AC_PROG_CC
 AC_OUTPUT

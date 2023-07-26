@@ -54,8 +54,8 @@ void run_exec(const char **argv) {
         if (cur_session == 0)
                 return;
 
-        char buffer[4096];
-        strcat(buffer, "EXEC ");
+        char *buffer = malloc(4096);
+        strcpy(buffer, "EXEC ");
         size_t idx = 0;
         const char *temp = argv[idx];
         while (temp != NULL) {
@@ -63,15 +63,18 @@ void run_exec(const char **argv) {
                 strcat(buffer, " ");
                 temp = argv[++idx];
         }
+        buffer[strlen(buffer)-1] = '\0';
         strcat(buffer, "\r\n");
-        write_session(cur_session, buffer, strlen(buffer));
+        write_session(cur_session, buffer, 4096);
+        memset(buffer, 0, 4096);
 
         read_session(cur_session, buffer, 4096);
         printf(buffer);
+        free(buffer);
 }
 
 void parse_cmd(char *line) {
-        const char **tokens = str_split(line, " ");
+        const char **tokens = (const char**)str_split(line, " ");
         if (tokens == NULL)
                 return;
 

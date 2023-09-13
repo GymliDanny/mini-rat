@@ -8,6 +8,6 @@
         (type*)((char*)__mptr - offsetof(type, member)); })
 
 char* str_strip(char *str);
-char** str_split(char *str, const char *delim);
+size_t str_split(char*** arr, char *str, const char *delim);
 
 #endif

@@ -65,20 +65,19 @@ char* str_strip(char *str) {
         return str;
 }
 
-char** str_split(char *str, const char *delim) {
+size_t str_split(char*** arr, char *str, const char *delim) {
         size_t count = 0;
-        char **ret = NULL;
-        char *token;
         char *saveptr;
-        token = strtok_r(str, delim, &saveptr);
+        char *token = strtok_r(str, delim, &saveptr);
+
         while (token != NULL) {
                 count++;
-                ret = realloc(ret, sizeof(char*) * count);
-                ret[count-1] = strdup(str_strip(token));
+                *arr = realloc(*arr, sizeof(char*) * count);
+                (*arr)[count-1] = strdup(str_strip(token));
                 token = strtok_r(NULL, delim, &saveptr);
         }
         count++;
-        ret = realloc(ret, sizeof(char*) * count);
-        ret[count-1] = NULL;
-        return ret;
+        *arr = realloc(*arr, sizeof(char*) * count);
+        (*arr)[count-1] = NULL;
+        return count;
 }

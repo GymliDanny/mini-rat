@@ -43,17 +43,31 @@ void run_exec(char **argv) {
         const char** cargv = (const char**)argv;
         pid_t pid = fork();
         if (pid == 0) {
-                execvp(argv[0], argv);
+                if (execvp(cargv[0], cargv) == -1) {
+                        printf("ERROR IN EXEC\r\n");
+                        fflush(stdout);
+                }
                 exit(0);
         } else if (pid > 0) {
                 wait(NULL);
         } else {
-                send(socket, "ERROR EXECUTING COMMAND", 23, 0);
+                printf("ERROR IN FORK\r\n");
+                fflush(stdout);
         }
 }
 
-int handle_request(int socket, char *req) {
-        char **tokens = str_split(req, "\r\n");
+void hostinfo(void) {
+        char **argv = malloc(sizeof(char*) * 3);
+        argv[0] = "uname";
+        argv[1] = "-a";
+        argv[2] = NULL;
+        run_exec(argv);
+        free(argv);
+}
+
+int handle_request(char *req) {
+        char **argv = NULL;
+        size_t count = str_split(&argv, req, " ");
 
         if (strcmp(tokens[0], "HOSTINFO") == 0) {
                 hostinfo(socket);
@@ -63,6 +77,7 @@ int handle_request(int socket, char *req) {
         } else if (strncmp(tokens[0], "EXIT", 4) == 0) {
                 return 1;
         }
+        free(argv);
         return 0;
 }
 

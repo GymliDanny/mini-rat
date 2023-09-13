@@ -50,6 +50,8 @@ void run_exec(char **argv) {
                 exit(0);
         } else if (pid > 0) {
                 wait(NULL);
+                printf("RETURN\r\n");
+                fflush(stdout);
         } else {
                 printf("ERROR IN FORK\r\n");
                 fflush(stdout);
@@ -69,13 +71,18 @@ int handle_request(char *req) {
         char **argv = NULL;
         size_t count = str_split(&argv, req, " ");
 
-        if (strcmp(tokens[0], "HOSTINFO") == 0) {
-                hostinfo(socket);
-        } else if (strncmp(tokens[0], "EXEC", 4) == 0) {
-                char **argv = str_split(req, " ");
-                run_exec(socket, &argv[1]);
-        } else if (strncmp(tokens[0], "EXIT", 4) == 0) {
+        if (strcmp(argv[0], "HOSTINFO") == 0) {
+                hostinfo();
+        } else if (strcmp(argv[0], "EXEC") == 0) {
+                run_exec(&argv[1]);
+        } else if (strcmp(argv[0], "EXIT") == 0) {
                 return 1;
+        } else if (strcmp(argv[0], "PING") == 0) {
+                printf("PONG\r\n");
+                fflush(stdout);
+        } else {
+                printf("NOT A COMMAND\r\n");
+                fflush(stdout);
         }
         free(argv);
         return 0;

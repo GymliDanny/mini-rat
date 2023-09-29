@@ -69,7 +69,7 @@ void* listener(void *port) {
                 return NULL;
         }
         listen(server_sock, 5);
-        log_msg(LOG_INFO, "Mini-RAT running on port %d\n", port_num);
+        log_msg(LOG_INFO, "Mini-RAT v%s running on port %d\n", PACKAGE_VERSION, port_num);
 
         int client_sock = 0;
         pthread_t newthread;

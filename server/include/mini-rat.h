@@ -73,4 +73,6 @@
 #include <stdarg.h>
 #endif
 
+void parse_cmd(int sock, char *line);
+
 #endif // ifndef MINI_RAT_H

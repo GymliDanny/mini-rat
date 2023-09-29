@@ -40,14 +40,12 @@ int ping_pong(int sock) {
         char buffer[6];
         memset(buffer, 0, 6);
 
-        pthread_mutex_lock(&sock_mutex);
-        if (output_pump(sock, "PING\r\n", 6) != -1)
+        if (send(sock, "PING\r\n", 6, 0) != -1)
                 ret = -1;
-        if (input_pump(sock, buffer, 6) == -1)
+        if (recv(sock, buffer, 6, 0) == -1)
                 ret = -1;
         if (strncmp(buffer, "PONG\r\n", 6) != 0)
                 ret = -1;
-        pthread_mutex_unlock(&sock_mutex);
 
         return ret;
 }
@@ -55,7 +53,6 @@ int ping_pong(int sock) {
 void* worker(void *sock_desc) {
         int sock = *(int*)sock_desc;
         fcntl(sock, F_SETFL, fcntl(sock, F_GETFL, 0) & O_NONBLOCK);
-        pthread_mutex_init(&sock_mutex, NULL);
 
         struct session *ses = find_session(init_session(sock));
         log_msg(LOG_INFO, "New session created with ID=%d\n", ses->id);
@@ -68,31 +65,5 @@ void* worker(void *sock_desc) {
                         ping_pong(sock);
         }
 
-        return 0;
-}
-
-ssize_t output_pump(int sock, char *buffer, size_t sz) {
-        struct pollfd pfd[1];
-        pfd[0].fd = sock;
-        pfd[0].events = POLLOUT;
-        int status = poll(pfd, 1, 10000);
-        if (status < 0)
-                return -1;
-        else if (pfd[0].revents & POLLOUT)
-                return send(sock, buffer, sz, 0);
-
-        return 0;
-}
-
-ssize_t input_pump(int sock, char *buffer, size_t sz) {
-        struct pollfd pfd[1];
-        pfd[0].fd = sock;
-        pfd[0].events = POLLIN;
-        int status = poll(pfd, 1, 10000);
-        if (status < 0)
-                return -1;
-        else if (pfd[0].revents & POLLIN)
-                return recv(sock, buffer, sz, 0);
-        
         return 0;
 }

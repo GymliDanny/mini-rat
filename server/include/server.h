@@ -11,7 +11,4 @@ int ping_pong(int sock);
 void* listener(void *port);
 void* worker(void *sock_desc);
 
-ssize_t output_pump(int sock, char *buffer, size_t sz);
-ssize_t input_pump(int sock, char *buffer, size_t sz);
-
 #endif

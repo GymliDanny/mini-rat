@@ -33,7 +33,7 @@ ssize_t write_session(int id, char *buffer, size_t sz) {
         if (ses == NULL)
                 return -1;
 
-        return output_pump(ses->socket, buffer, sz);
+        return send(ses->socket, buffer, sz, 0);
 }
 
 ssize_t read_session(int id, char *buffer, size_t sz) {
@@ -41,7 +41,7 @@ ssize_t read_session(int id, char *buffer, size_t sz) {
         if (ses == NULL)
                 return -1;
 
-        return input_pump(ses->socket, buffer, sz);
+        return recv(ses->socket, buffer, sz, 0);
 }
 
 void kill_session(int id) {

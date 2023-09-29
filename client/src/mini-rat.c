@@ -50,6 +50,7 @@ void run_exec(char **argv) {
                 exit(0);
         } else if (pid > 0) {
                 wait(NULL);
+                printf("\r\n");
                 printf("RETURN\r\n");
                 fflush(stdout);
         } else {

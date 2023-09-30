@@ -100,8 +100,6 @@ int ping_pong(int sock) {
 
 void* worker(void *sock_desc) {
         int sock = *(int*)sock_desc;
-        fcntl(sock, F_SETFL, fcntl(sock, F_GETFL, 0) & O_NONBLOCK);
-
         struct session *ses = find_session(init_session(sock));
         log_msg(LOG_INFO, "New session created with ID=%d\n", ses->id);
 

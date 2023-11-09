@@ -102,9 +102,7 @@ void run_exec(int sock, const char **argv) {
         memset(buffer, 0, 4096);
 
         read_session(cur_session, buffer, 4096);
-        char* lines = NULL;
-        str_split(lines, &buffer, "\r\n");
-        dprintf(sock, lines[0]);
+        dprintf(sock, buffer);
         free(buffer);
 }
 

